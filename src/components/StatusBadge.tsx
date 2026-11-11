@@ -3,23 +3,23 @@ import type { ReactNode } from "react";
 export type BadgeStatus = "lulus" | "tidak lolos" | "baru" | "proses";
 
 const styles: Record<BadgeStatus, string> = {
-  lulus: "bg-success-bg text-success-text ring-success/20",
-  "tidak lolos": "bg-danger-bg text-danger-text ring-danger/20",
-  proses: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  baru: "bg-brand-bg text-brand-text ring-brand/20",
+  lulus: "bg-success text-slate-900",
+  "tidak lolos": "bg-danger text-white",
+  proses: "bg-amber-300 text-slate-900",
+  baru: "bg-brand-light text-slate-900",
 };
 
 const dots: Record<BadgeStatus, string> = {
-  lulus: "bg-success",
-  "tidak lolos": "bg-danger",
-  proses: "bg-amber-500",
-  baru: "bg-brand-light",
+  lulus: "bg-slate-900",
+  "tidak lolos": "bg-white",
+  proses: "bg-slate-900",
+  baru: "bg-slate-900",
 };
 
 export function StatusBadge({ status, children }: { status: BadgeStatus; children?: ReactNode }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${styles[status]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border-2 border-slate-900 px-2.5 py-0.5 text-xs font-bold shadow-[2px_2px_0_#0f172a] ${styles[status]}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${dots[status]}`} />
       {children ?? status}

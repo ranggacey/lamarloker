@@ -232,3 +232,67 @@ export function IconFilter({ className }: IconProps) {
     </Base>
   );
 }
+
+export function IconHome({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M3 11l9-8 9 8" />
+      <path d="M5 10v10h5v-6h4v6h5V10" />
+    </Base>
+  );
+}
+
+export function IconPlus({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </Base>
+  );
+}
+
+export function IconTrash({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M4 7h16" />
+      <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      <path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </Base>
+  );
+}
+
+export function IconMapPin({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </Base>
+  );
+}
+
+export function IconBuilding({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <rect x="4" y="3" width="16" height="18" rx="1" />
+      <path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2" />
+      <path d="M10 21v-3h4v3" />
+    </Base>
+  );
+}
+
+export function IconCheck({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M4 12.5l5 5L20 6.5" />
+    </Base>
+  );
+}
+
+export function IconCalendar({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M8 3v4M16 3v4M3 10h18" />
+    </Base>
+  );
+}

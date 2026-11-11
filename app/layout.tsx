@@ -25,12 +25,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="id" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-brand-bg text-slate-900">
         <Suspense
-          fallback={<header className="sticky top-0 z-40 h-16 border-b border-slate-200 bg-white/90" />}
+          fallback={<header className="sticky top-0 z-40 h-16 border-b-2 border-slate-900 bg-white" />}
         >
           <Nav />
         </Suspense>
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-slate-200 bg-white py-6 text-center text-sm text-slate-500">
+        <footer className="border-t-2 border-slate-900 bg-white py-6 text-center text-sm font-medium text-slate-600">
           LamarLoker — portal lamaran kerja. Skor tes 70 ke atas dinyatakan lulus.
         </footer>
       </body>

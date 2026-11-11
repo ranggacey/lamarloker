@@ -28,3 +28,165 @@ body {
   color: #0f172a;
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* ---------- Soft neobrutalism ---------- */
+/* Border tebal slate-900 + shadow offset keras + sudut rounded (soft).
+   Ditulis sebagai CSS biasa (bukan @apply) supaya tidak ada risiko build. */
+
+.card-brutal {
+  background: #fff;
+  border: 2px solid #0f172a;
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0 #0f172a;
+}
+
+.card-brutal-flat {
+  background: #fff;
+  border: 2px solid #0f172a;
+  border-radius: 1rem;
+  box-shadow: 2px 2px 0 #0f172a;
+}
+
+.btn-brutal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #0f172a;
+  border-radius: 0.75rem;
+  background: #fa699e;
+  color: #fff;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  box-shadow: 3px 3px 0 #0f172a;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-brutal:hover {
+  background: #e14e8a;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #0f172a;
+}
+.btn-brutal:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #0f172a;
+}
+.btn-brutal:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 3px 3px 0 #0f172a;
+}
+
+.btn-brutal-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #0f172a;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #0f172a;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  box-shadow: 3px 3px 0 #0f172a;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-brutal-white:hover {
+  background: #ffe7f0;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #0f172a;
+}
+.btn-brutal-white:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #0f172a;
+}
+.btn-brutal-white:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 3px 3px 0 #0f172a;
+}
+
+.btn-brutal-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #0f172a;
+  border-radius: 0.75rem;
+  background: #0f172a;
+  color: #fff;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  box-shadow: 3px 3px 0 #fa699e;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-brutal-dark:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #fa699e;
+}
+.btn-brutal-dark:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #fa699e;
+}
+.btn-brutal-dark:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 3px 3px 0 #fa699e;
+}
+
+.input-brutal {
+  width: 100%;
+  border: 2px solid #0f172a;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #0f172a;
+  outline: none;
+}
+.input-brutal::placeholder {
+  color: #94a3b8;
+}
+.input-brutal:focus {
+  box-shadow: 3px 3px 0 #fa699e;
+}
+
+.chip-brutal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 2px solid #0f172a;
+  border-radius: 9999px;
+  background: #ffe7f0;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.chip-brutal-green {
+  background: #4add82;
+  color: #0f172a;
+}
+
+.chip-brutal-white {
+  background: #fff;
+  color: #0f172a;
+}

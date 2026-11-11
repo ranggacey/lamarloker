@@ -17,7 +17,10 @@ type Row = (string | number)[];
 
 async function getRows(): Promise<Row[]> {
   await connectDB();
-  const users = await User.find({ role: "pelamar" }).sort({ createdAt: -1 }).lean();
+  const users = await User.find({ role: "pelamar" })
+    .populate("appliedJobId", "title")
+    .sort({ createdAt: -1 })
+    .lean();
   const ids = users.map((u) => u._id);
   const scores = await TestScore.find({ applicant: { $in: ids } }).lean();
 
@@ -28,10 +31,11 @@ async function getRows(): Promise<Row[]> {
     scoreMap.get(key)!.set(s.type, s.score);
   }
 
-  const header: Row = ["Nama", "Email", "Telepon", "Pendidikan", "Status", "Skor Interview", "Skor Psikotes", "Link CV"];
+  const header: Row = ["Nama", "Email", "Telepon", "Pendidikan", "Status", "Skor Interview", "Skor Psikotes", "Posisi Dilamar", "Link CV"];
   const rows: Row[] = [header];
   for (const u of users) {
     const sm = scoreMap.get(String(u._id));
+    const job = u.appliedJobId as unknown as { title?: string } | null;
     rows.push([
       u.name,
       u.email,
@@ -40,6 +44,7 @@ async function getRows(): Promise<Row[]> {
       u.status,
       sm?.get("interview") ?? "",
       sm?.get("psikotes") ?? "",
+      job && typeof job === "object" && job.title ? job.title : "-",
       u.cvUrl ?? "",
     ]);
   }
@@ -62,6 +67,7 @@ function toXlsx(rows: Row[]): Buffer {
     { wch: 12 },
     { wch: 14 },
     { wch: 14 },
+    { wch: 22 },
     { wch: 40 },
   ];
   const wb = XLSX.utils.book_new();
@@ -83,7 +89,7 @@ function toPdf(rows: Row[]): Buffer {
     styles: { fontSize: 8, cellPadding: 4 },
     headStyles: { fillColor: [250, 105, 158], textColor: 255 },
     alternateRowStyles: { fillColor: [255, 231, 240] },
-    columnStyles: { 7: { cellWidth: 110 } },
+    columnStyles: { 8: { cellWidth: 110 } },
   });
   return Buffer.from(doc.output("arraybuffer"));
 }

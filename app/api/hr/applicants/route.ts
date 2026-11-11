@@ -32,7 +32,11 @@ export async function GET(req: NextRequest) {
     }
 
     await connectDB();
-    const users = await User.find(filter).sort({ createdAt: -1 }).limit(200).lean();
+    const users = await User.find(filter)
+      .populate("appliedJobId", "title")
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
     const ids = users.map((u) => u._id);
     const scores = await TestScore.find({ applicant: { $in: ids } }).lean();
 
@@ -46,18 +50,22 @@ export async function GET(req: NextRequest) {
 
     return jsonOk({
       total: users.length,
-      applicants: users.map((u) => ({
-        id: String(u._id),
-        name: u.name,
-        email: u.email,
-        phone: u.phone ?? "",
-        education: u.education ?? "",
-        status: u.status,
-        cvUrl: u.cvUrl ?? "",
-        photoUrl: u.photoUrl ?? "",
-        createdAt: u.createdAt,
-        scores: byApplicant.get(String(u._id)) ?? [],
-      })),
+      applicants: users.map((u) => {
+        const job = u.appliedJobId as unknown as { title?: string } | null;
+        return {
+          id: String(u._id),
+          name: u.name,
+          email: u.email,
+          phone: u.phone ?? "",
+          education: u.education ?? "",
+          status: u.status,
+          cvUrl: u.cvUrl ?? "",
+          photoUrl: u.photoUrl ?? "",
+          appliedJob: job && typeof job === "object" && job.title ? job.title : "",
+          createdAt: u.createdAt,
+          scores: byApplicant.get(String(u._id)) ?? [],
+        };
+      }),
     });
   } catch (err) {
     return handleError(err);

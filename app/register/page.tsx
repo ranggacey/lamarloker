@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IconBriefcase } from "@/components/icons";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -48,25 +49,26 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-12 sm:px-6">
-      <div className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-white">
+      <LoadingOverlay show={loading} message="Mendaftar..." />
+      <div className="card-brutal w-full p-6 sm:p-8">
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-slate-900 bg-brand text-white shadow-[2px_2px_0_#0f172a]">
           <IconBriefcase className="h-6 w-6" />
         </span>
-        <h1 className="mt-4 text-2xl font-bold text-slate-900">Daftar akun baru</h1>
+        <h1 className="mt-4 text-2xl font-black text-slate-900">Daftar akun baru</h1>
         <p className="mt-1 text-sm text-slate-600">
           Sudah punya akun?{" "}
-          <Link href="/login" className="font-semibold text-brand-text hover:text-brand-text">
+          <Link href="/login" className="font-bold text-brand-text hover:underline">
             Masuk di sini
           </Link>
         </p>
         <p className="mt-2 text-sm text-slate-600">
-          Pendaftaran ini untuk <span className="font-semibold text-slate-900">pelamar</span>. Akun
+          Pendaftaran ini untuk <span className="font-bold text-slate-900">pelamar</span>. Akun
           HR dibuat oleh admin, bukan dari halaman ini.
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-slate-700">
+            <label htmlFor="name" className="mb-1.5 block text-sm font-bold text-slate-700">
               Nama lengkap
             </label>
             <input
@@ -76,11 +78,11 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nama Anda"
-              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+              className="input-brutal"
             />
           </div>
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
+            <label htmlFor="email" className="mb-1.5 block text-sm font-bold text-slate-700">
               Email
             </label>
             <input
@@ -90,12 +92,12 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@email.com"
-              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+              className="input-brutal"
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700">
+              <label htmlFor="password" className="mb-1.5 block text-sm font-bold text-slate-700">
                 Password
               </label>
               <input
@@ -106,11 +108,11 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min. 8 karakter"
-                className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+                className="input-brutal"
               />
             </div>
             <div>
-              <label htmlFor="confirm" className="mb-1.5 block text-sm font-medium text-slate-700">
+              <label htmlFor="confirm" className="mb-1.5 block text-sm font-bold text-slate-700">
                 Ulangi password
               </label>
               <input
@@ -120,22 +122,18 @@ export default function RegisterPage() {
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 placeholder="Ulangi password"
-                className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+                className="input-brutal"
               />
             </div>
           </div>
 
           {error && (
-            <p className="rounded-xl bg-danger-bg px-4 py-3 text-sm text-danger-text ring-1 ring-inset ring-danger/20">
+            <p className="rounded-xl border-2 border-slate-900 bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text shadow-[3px_3px_0_#0f172a]">
               {error}
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-brand py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
-          >
+          <button type="submit" disabled={loading} className="btn-brutal w-full !py-3">
             {loading ? "Memproses..." : "Buat akun"}
           </button>
         </form>

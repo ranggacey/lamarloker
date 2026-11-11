@@ -27,7 +27,7 @@ export function proxy(request: NextRequest) {
   const role = token ? decodeRole(token) : null;
   const home = role === "hr" ? "/hr" : "/dashboard";
 
-  if (pathname.startsWith("/dashboard")) {
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/profil")) {
     if (!role) return NextResponse.redirect(new URL("/login", request.url));
     if (role === "hr") return NextResponse.redirect(new URL("/hr", request.url));
     return NextResponse.next();
@@ -48,5 +48,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/hr/:path*", "/login", "/register"],
+  // /lowongan sengaja publik (pelamar bisa lihat lowongan tanpa login; Lamar butuh login).
+  matcher: ["/dashboard/:path*", "/profil/:path*", "/hr/:path*", "/login", "/register"],
 };
