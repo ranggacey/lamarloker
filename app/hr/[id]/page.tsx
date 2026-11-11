@@ -18,6 +18,8 @@ import {
 import { StatusBadge, ScoreBadge } from "@/components/StatusBadge";
 import ApplicationTracker from "@/components/ApplicationTracker";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import CustomSelect from "@/components/CustomSelect";
+import StatusSegmented from "@/components/StatusSegmented";
 
 interface Experience {
   id: string;
@@ -76,13 +78,6 @@ function safeFilename(name: string): string {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   return slug || "pelamar";
 }
-
-const STATUS_OPTIONS: { value: Applicant["status"]; label: string }[] = [
-  { value: "baru", label: "Baru Daftar" },
-  { value: "proses", label: "Proses" },
-  { value: "lulus", label: "Lolos" },
-  { value: "tidak lolos", label: "Tidak Lolos" },
-];
 
 function HrDetailContent() {
   const params = useParams();
@@ -278,23 +273,23 @@ function HrDetailContent() {
       </Link>
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-start gap-4">
+        <div className="flex min-w-0 flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:gap-4">
           {applicant.photoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={applicant.photoUrl} alt={applicant.name} className="h-20 w-20 rounded-2xl object-cover ring-2 ring-line" />
+            <img src={applicant.photoUrl} alt={applicant.name} className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-2 ring-line" />
           ) : (
-            <span className="flex h-20 w-20 items-center justify-center rounded-2xl bg-info-bg text-slate-400">
+            <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-info-bg text-slate-400">
               <IconUser className="h-10 w-10" />
             </span>
           )}
-          <div>
-            <h1 className="text-2xl font-extrabold text-ink">{applicant.name}</h1>
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-extrabold text-ink">{applicant.name}</h1>
             <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
-              <IconMail className="h-4 w-4" /> {applicant.email}
+              <IconMail className="h-4 w-4 shrink-0" /> <span className="break-all">{applicant.email}</span>
             </p>
             {applicant.phone && (
               <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted">
-                <IconPhone className="h-4 w-4" /> {applicant.phone}
+                <IconPhone className="h-4 w-4 shrink-0" /> {applicant.phone}
               </p>
             )}
             <p className="mt-1 text-xs text-slate-400">
@@ -302,7 +297,7 @@ function HrDetailContent() {
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-start gap-2 sm:items-end">
           <StatusBadge status={applicant.status} />
           <button onClick={exportOne} disabled={exporting} className="btn-primary !py-2 !text-xs">
             <IconDownload className="h-4 w-4" />
@@ -411,11 +406,16 @@ function HrDetailContent() {
             </p>
             <div className="mt-4 space-y-4">
               <div>
-                <label htmlFor="type" className="mb-1.5 block text-sm font-semibold text-slate-700">Jenis tes</label>
-                <select id="type" value={type} onChange={(e) => setType(e.target.value as "interview" | "psikotes")} className={inputCls}>
-                  <option value="interview">Interview</option>
-                  <option value="psikotes">Psikotes</option>
-                </select>
+                <label id="type-label" className="mb-1.5 block text-sm font-semibold text-slate-700">Jenis tes</label>
+                <CustomSelect
+                  value={type}
+                  onChange={(v) => setType(v as "interview" | "psikotes")}
+                  options={[
+                    { value: "interview", label: "Interview" },
+                    { value: "psikotes", label: "Psikotes" },
+                  ]}
+                  ariaLabel="Jenis tes"
+                />
               </div>
               <div>
                 <label htmlFor="score" className="mb-1.5 block text-sm font-semibold text-slate-700">Skor (0–100)</label>
@@ -464,19 +464,12 @@ function HrDetailContent() {
               interview diinput/diubah lagi, status akan mengikuti skor interview secara otomatis.
             </p>
             <div className="mt-4">
-              <label htmlFor="statusManual" className="mb-1.5 block text-sm font-semibold text-slate-700">Status</label>
-              <select
-                id="statusManual"
+              <span id="statusManual-label" className="mb-1.5 block text-sm font-semibold text-slate-700">Status</span>
+              <StatusSegmented
                 value={statusValue}
-                onChange={(e) => setStatusValue(e.target.value as Applicant["status"])}
-                className={inputCls}
-              >
-                {STATUS_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setStatusValue}
+                ariaLabel="Pilih status pelamar"
+              />
             </div>
             {statusMsg && (
               <p className="mt-4 rounded-xl bg-success-bg px-4 py-3 text-sm font-medium text-success-text">

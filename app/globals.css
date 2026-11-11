@@ -45,6 +45,34 @@ body {
   line-height: 1.6;
 }
 
+/* Cegah scroll horizontal dari konten yang meluber di layar sempit. */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* Focus ring konsisten (ungu lembut) untuk semua kontrol interaktif. */
+:focus-visible {
+  outline: 2px solid #d884db;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Safety net: kalau ada <select> tersisa di mana pun, jangan tampil seperti
+   bawaan browser — sembunyikan panah default, pakai chevron sendiri. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem !important;
+}
+select::-ms-expand {
+  display: none;
+}
+
 /* ---------- Hierarki tipografi Inter (korporat) ----------
    Judul tegas: tebal 700-800, line-height rapat, letter-spacing sedikit
    negatif. Subjudul/label seksi memakai .eyebrow (kapital, tracking lebar).

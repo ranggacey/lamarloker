@@ -144,6 +144,14 @@ export function IconChevronRight({ className }: IconProps) {
   );
 }
 
+export function IconChevronDown({ className }: IconProps) {
+  return (
+    <Base className={className}>
+      <path d="M6 9l6 6 6-6" />
+    </Base>
+  );
+}
+
 export function IconMenu({ className }: IconProps) {
   return (
     <Base className={className}>

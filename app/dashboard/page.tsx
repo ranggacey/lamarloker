@@ -115,10 +115,10 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="eyebrow">Beranda Pelamar</p>
-          <h1 className="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">Halo, {profile.name}</h1>
-          <p className="mt-1 text-sm text-muted">{profile.email}</p>
+          <h1 className="mt-1 break-words text-2xl font-extrabold text-ink sm:text-3xl">Halo, {profile.name}</h1>
+          <p className="mt-1 break-all text-sm text-muted">{profile.email}</p>
         </div>
         <StatusBadge status={profile.status} />
       </div>
@@ -145,6 +145,21 @@ export default function DashboardPage() {
             <span className="chip">
               {doneCount}/{checklist.length} lengkap
             </span>
+          </div>
+          {/* Progress bar kelengkapan */}
+          <div className="mt-4">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#f1eafe]">
+              <div
+                className="grad-primary h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.round((doneCount / checklist.length) * 100)}%` }}
+              />
+            </div>
+            <p className="mt-1.5 text-xs font-semibold text-muted">
+              {Math.round((doneCount / checklist.length) * 100)}% lengkap —{" "}
+              {doneCount === checklist.length
+                ? "profilmu sudah lengkap, siap ikut tes."
+                : "lengkapi sisanya supaya HR bisa menilai lamaranmu."}
+            </p>
           </div>
           <ul className="mt-4 space-y-2.5">
             {checklist.map((c) => (

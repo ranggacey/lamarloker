@@ -15,8 +15,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { IconChevronRight, IconDownload, IconEye, IconFilter, IconSearch, IconUsers } from "@/components/icons";
+import { IconCheckCircle, IconChevronRight, IconClock, IconDownload, IconEye, IconFilter, IconSearch, IconUser, IconUsers, IconXCircle } from "@/components/icons";
 import { StatusBadge, ScoreBadge } from "@/components/StatusBadge";
+import CustomSelect from "@/components/CustomSelect";
 
 interface ApplicantScore {
   type: string;
@@ -41,10 +42,10 @@ interface Applicant {
 
 const statusOptions = [
   { value: "", label: "Semua status" },
-  { value: "baru", label: "Baru" },
-  { value: "proses", label: "Proses" },
-  { value: "lulus", label: "Lulus" },
-  { value: "tidak lolos", label: "Tidak lolos" },
+  { value: "baru", label: "Baru", color: "#8b5cf6" },
+  { value: "proses", label: "Proses", color: "#d97706" },
+  { value: "lulus", label: "Lulus", color: "#16a34a" },
+  { value: "tidak lolos", label: "Tidak lolos", color: "#dc2626" },
 ] as const;
 
 function scoreOf(a: Applicant, type: string): ApplicantScore | undefined {
@@ -217,18 +218,64 @@ export default function HrPage() {
         </div>
       </div>
 
-      {/* Statistik */}
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+      {/* Statistik — kartu enterprise: ikon + label + angka besar + subteks */}
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {[
-          { label: "Total pelamar", value: total, cls: "text-ink" },
-          { label: "Lulus", value: counts.lulus, cls: "text-success-text" },
-          { label: "Proses", value: counts.proses, cls: "text-warning-text" },
-          { label: "Baru", value: counts.baru, cls: "text-brand-text" },
-          { label: "Tidak lolos", value: counts.tidakLolos, cls: "text-danger" },
+          {
+            label: "Total pelamar",
+            value: total,
+            sub: "semua pelamar terdaftar",
+            icon: <IconUsers className="h-5 w-5" />,
+            iconCls: "grad-primary text-white shadow-md shadow-brand/30",
+            valueCls: "text-ink",
+            span: "col-span-2 sm:col-span-1",
+          },
+          {
+            label: "Lulus",
+            value: counts.lulus,
+            sub: total ? `${Math.round((counts.lulus / total) * 100)}% dari total` : "belum ada yang lulus",
+            icon: <IconCheckCircle className="h-5 w-5" />,
+            iconCls: "bg-success-bg text-success-text",
+            valueCls: "text-success-text",
+            span: "",
+          },
+          {
+            label: "Proses",
+            value: counts.proses,
+            sub: "sedang diseleksi",
+            icon: <IconClock className="h-5 w-5" />,
+            iconCls: "bg-warning-bg text-warning-text",
+            valueCls: "text-warning-text",
+            span: "",
+          },
+          {
+            label: "Baru",
+            value: counts.baru,
+            sub: "menunggu diproses",
+            icon: <IconUser className="h-5 w-5" />,
+            iconCls: "bg-info-bg text-info-text",
+            valueCls: "text-brand-text",
+            span: "",
+          },
+          {
+            label: "Tidak lolos",
+            value: counts.tidakLolos,
+            sub: total ? `${Math.round((counts.tidakLolos / total) * 100)}% dari total` : "belum ada",
+            icon: <IconXCircle className="h-5 w-5" />,
+            iconCls: "bg-danger-bg text-danger-text",
+            valueCls: "text-danger",
+            span: "",
+          },
         ].map((s) => (
-          <div key={s.label} className="card p-4">
-            <p className="text-xs font-semibold text-muted">{s.label}</p>
-            <p className={`mt-1 text-2xl font-extrabold ${s.cls}`}>{s.value}</p>
+          <div key={s.label} className={`card p-4 sm:p-5 ${s.span}`}>
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs font-semibold text-muted">{s.label}</p>
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${s.iconCls}`}>
+                {s.icon}
+              </span>
+            </div>
+            <p className={`mt-1 text-3xl font-extrabold tracking-tight ${s.valueCls}`}>{s.value}</p>
+            <p className="mt-1 text-[11px] leading-tight text-muted">{s.sub}</p>
           </div>
         ))}
       </div>
@@ -346,6 +393,42 @@ export default function HrPage() {
         </div>
       )}
 
+      {/* Aktivitas terbaru — 5 pelamar paling baru (dari data yang sudah dimuat) */}
+      {!loading && applicants.length > 0 && (
+        <div className="card mt-6 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="eyebrow">Aktivitas Terbaru</p>
+              <h2 className="mt-1 text-base font-bold text-ink">Pelamar terbaru</h2>
+            </div>
+            <span className="chip">{Math.min(5, applicants.length)} terbaru</span>
+          </div>
+          <ul className="mt-4 divide-y divide-line">
+            {[...applicants]
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 5)
+              .map((a) => (
+                <li key={a.id}>
+                  <Link href={`/hr/${a.id}`} className="flex flex-wrap items-center gap-3 py-3 transition-colors hover:bg-[#fbfaff]">
+                    <span className="grad-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white">
+                      {a.name.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-bold text-ink">{a.name}</span>
+                      <span className="block truncate text-xs text-muted">
+                        {a.appliedJob || "Belum memilih posisi"} ·{" "}
+                        {new Date(a.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                      </span>
+                    </span>
+                    <StatusBadge status={a.status} />
+                    <IconChevronRight className="h-4 w-4 shrink-0 text-slate-300" />
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+
       {/* Cari + filter */}
       <div className="card mt-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
         <div className="relative flex-1">
@@ -357,20 +440,14 @@ export default function HrPage() {
             className="input !pl-10"
           />
         </div>
-        <div className="relative">
-          <IconFilter className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="input w-full appearance-none !pl-10 sm:w-48"
-          >
-            {statusOptions.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CustomSelect
+          value={status}
+          onChange={setStatus}
+          options={[...statusOptions]}
+          ariaLabel="Filter berdasarkan status"
+          icon={<IconFilter className="h-5 w-5" />}
+          className="w-full sm:w-56"
+        />
       </div>
 
       {error && (

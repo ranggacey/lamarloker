@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { IconBriefcase, IconBuilding, IconMapPin, IconPlus, IconTrash } from "@/components/icons";
+import CustomSelect from "@/components/CustomSelect";
 
 interface Job {
   id: string;
@@ -161,12 +162,13 @@ export default function HrLowonganPage() {
                 <input id="division" className="input" value={division} onChange={(e) => setDivision(e.target.value)} placeholder="cth: Administrasi" />
               </div>
               <div>
-                <label htmlFor="type" className="mb-1.5 block text-sm font-semibold text-slate-700">Tipe</label>
-                <select id="type" className="input" value={type} onChange={(e) => setType(e.target.value)}>
-                  {TYPE_OPTIONS.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
+                <label id="type-label" className="mb-1.5 block text-sm font-semibold text-slate-700">Tipe</label>
+                <CustomSelect
+                  value={type}
+                  onChange={setType}
+                  options={TYPE_OPTIONS.map((t) => ({ value: t, label: t }))}
+                  ariaLabel="Tipe lowongan"
+                />
               </div>
             </div>
             <div>
