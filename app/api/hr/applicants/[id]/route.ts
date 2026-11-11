@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { jsonOk, jsonError, handleError } from "@/lib/http";
-import { User, type IExperience } from "@/models/User";
+import { User, type IExperience, type ApplicantStatus } from "@/models/User";
 import { TestScore } from "@/models/TestScore";
 
 /** Detail satu pelamar + riwayat skornya (HR saja). */
@@ -20,13 +20,16 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     );
     if (!user) return jsonError("Pelamar tidak ditemukan", 404);
 
-    const scores = await TestScore.find({ applicant: user._id }).sort({ updatedAt: -1 }).lean();
-
     const job = user.appliedJobId as unknown as { _id?: unknown; title?: string; division?: string } | null;
     const appliedJob =
       job && typeof job === "object" && "title" in job
         ? { id: String(job._id ?? ""), title: job.title ?? "", division: job.division ?? "" }
         : null;
+
+    // Skor hanya untuk lamaran yang sedang berjalan (appliedJobId saat ini).
+    const scores = await TestScore.find({ applicant: user._id, job: job?._id ?? null })
+      .sort({ updatedAt: -1 })
+      .lean();
 
     return jsonOk({
       applicant: {
@@ -64,6 +67,37 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
         updatedAt: s.updatedAt,
       })),
     });
+  } catch (err) {
+    return handleError(err);
+  }
+}
+
+/** Ubah status pelamar secara manual (HR saja). Dipakai untuk menandai
+    "proses" saat seleksi berjalan, atau mengoreksi hasil otomatis dari
+    skor interview (mis. lolos/tidak lolos). Status yang diubah manual
+    tetap berlaku sampai skor interview diinput/diubah lagi. */
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  try {
+    const auth = getAuthUser(req);
+    if (!auth) return jsonError("Belum login", 401);
+    if (auth.role !== "hr") return jsonError("Hanya HR yang boleh mengubah status pelamar", 403);
+
+    const { id } = await ctx.params;
+    const body = (await req.json()) as { status?: string };
+    const status = body.status as ApplicantStatus;
+    if (status !== "baru" && status !== "proses" && status !== "lulus" && status !== "tidak lolos") {
+      return jsonError("Status tidak valid (baru / proses / lulus / tidak lolos)", 400);
+    }
+
+    await connectDB();
+    const user = await User.findOneAndUpdate(
+      { _id: id, role: "pelamar" },
+      { status },
+      { new: true }
+    );
+    if (!user) return jsonError("Pelamar tidak ditemukan", 404);
+
+    return jsonOk({ applicantStatus: user.status });
   } catch (err) {
     return handleError(err);
   }

@@ -69,15 +69,15 @@ export default function Nav() {
   const linkCls = (href: string) => {
     const active = pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
     return active
-      ? "shrink-0 rounded-lg border-2 border-slate-900 bg-slate-900 px-3 py-1.5 text-sm font-bold text-white shadow-[2px_2px_0_#fa699e]"
-      : "shrink-0 rounded-lg border-2 border-transparent px-3 py-1.5 text-sm font-bold text-slate-700 hover:border-slate-900 hover:bg-brand-bg";
+      ? "shrink-0 rounded-full bg-white px-3.5 py-1.5 text-sm font-bold text-brand-deep shadow-sm"
+      : "shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold text-white/90 transition-colors hover:bg-white/15 hover:text-white";
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-slate-900 bg-white">
+    <header className="grad-header sticky top-0 z-40 rounded-b-3xl shadow-[0_8px_30px_rgba(139,92,246,0.25)]">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:px-6">
-        <Link href={user ? home : "/"} className="flex shrink-0 items-center gap-2 text-lg font-black tracking-tight text-slate-900">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-slate-900 bg-brand text-white shadow-[2px_2px_0_#0f172a]">
+        <Link href={user ? home : "/"} className="flex shrink-0 items-center gap-2 text-lg font-extrabold tracking-tight text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 text-white ring-1 ring-white/40">
             <IconBriefcase className="h-5 w-5" />
           </span>
           LamarLoker
@@ -95,21 +95,30 @@ export default function Nav() {
         <div className="flex shrink-0 items-center gap-2">
           {loaded && !user && (
             <>
-              <Link href="/login" className="btn-brutal-white !px-3 !py-1.5">
+              <Link
+                href="/login"
+                className="rounded-xl bg-white px-3.5 py-2 text-sm font-bold text-brand-deep shadow-sm transition-all hover:-translate-y-px hover:shadow"
+              >
                 Masuk
               </Link>
-              <Link href="/register" className="btn-brutal !px-3 !py-1.5">
+              <Link
+                href="/register"
+                className="rounded-xl bg-gold px-3.5 py-2 text-sm font-bold text-ink shadow-sm transition-all hover:-translate-y-px hover:shadow"
+              >
                 Daftar
               </Link>
             </>
           )}
           {loaded && user && (
             <>
-              <span className="hidden items-center gap-1.5 rounded-full border-2 border-slate-900 bg-brand-bg px-3 py-1.5 text-xs font-bold text-slate-900 lg:inline-flex">
+              <span className="hidden items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/30 lg:inline-flex">
                 {user.role === "hr" ? <IconUsers className="h-4 w-4" /> : <IconUser className="h-4 w-4" />}
                 {user.name}
               </span>
-              <button onClick={logout} className="btn-brutal-white !px-3 !py-1.5">
+              <button
+                onClick={logout}
+                className="flex items-center gap-1.5 rounded-xl bg-white/20 px-3 py-2 text-sm font-bold text-white ring-1 ring-white/30 transition-colors hover:bg-white/30"
+              >
                 <IconLogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Keluar</span>
               </button>
@@ -119,14 +128,14 @@ export default function Nav() {
       </div>
 
       {/* Mobile: link nav sebagai strip yang bisa di-scroll horizontal */}
-      <nav className="flex gap-1 overflow-x-auto border-t-2 border-slate-900 bg-brand-bg px-4 py-2 md:hidden">
+      <nav className="flex gap-1 overflow-x-auto px-4 pb-3 md:hidden">
         {links.map((l) => (
           <Link key={l.href} href={l.href} className={linkCls(l.href)}>
             {l.label}
           </Link>
         ))}
         {loaded && user && (
-          <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-lg border-2 border-slate-900 bg-white px-3 py-1.5 text-xs font-bold text-slate-900">
+          <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/30">
             {user.role === "hr" ? <IconUsers className="h-4 w-4" /> : <IconUser className="h-4 w-4" />}
             {user.name}
           </span>

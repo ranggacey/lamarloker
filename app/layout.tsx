@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -22,16 +18,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-brand-bg text-slate-900">
+    <html lang="id" className={`${inter.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-white text-slate-800">
         <Suspense
-          fallback={<header className="sticky top-0 z-40 h-16 border-b-2 border-slate-900 bg-white" />}
+          fallback={<header className="grad-header sticky top-0 z-40 h-16 rounded-b-3xl shadow-sm" />}
         >
           <Nav />
         </Suspense>
         <main className="flex-1">{children}</main>
-        <footer className="border-t-2 border-slate-900 bg-white py-6 text-center text-sm font-medium text-slate-600">
-          LamarLoker — portal lamaran kerja. Skor tes 70 ke atas dinyatakan lulus.
+        <footer className="grad-footer mt-16 py-8 text-center text-sm font-medium text-white">
+          <p className="font-bold">LamarLoker — Portal Lamaran Kerja</p>
+          <p className="mt-1 text-white/80">Skor tes 70 ke atas dinyatakan lulus.</p>
         </footer>
       </body>
     </html>

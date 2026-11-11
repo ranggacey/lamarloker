@@ -40,9 +40,21 @@ export async function GET(req: NextRequest) {
     const ids = users.map((u) => u._id);
     const scores = await TestScore.find({ applicant: { $in: ids } }).lean();
 
+    // Skor hanya untuk lamaran yang sedang berjalan: cocokkan skor dengan
+    // appliedJobId pelamar saat ini (skor lamaran lama tidak ditampilkan).
+    const currentJobByUser = new Map<string, string | null>();
+    for (const u of users) {
+      const jobDoc = u.appliedJobId as unknown as { _id?: unknown } | null;
+      currentJobByUser.set(
+        String(u._id),
+        jobDoc && typeof jobDoc === "object" && jobDoc._id ? String(jobDoc._id) : null
+      );
+    }
     const byApplicant = new Map<string, ScoreOut[]>();
     for (const s of scores) {
       const key = String(s.applicant);
+      const jobKey = s.job ? String(s.job) : null;
+      if (jobKey !== currentJobByUser.get(key)) continue;
       const arr = byApplicant.get(key) ?? [];
       arr.push({ type: s.type, score: s.score, status: s.status, updatedAt: s.updatedAt });
       byApplicant.set(key, arr);

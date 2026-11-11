@@ -41,21 +41,21 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-12 sm:px-6">
       <LoadingOverlay show={loading} message="Masuk..." />
-      <div className="card-brutal w-full p-6 sm:p-8">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-slate-900 bg-brand text-white shadow-[2px_2px_0_#0f172a]">
+      <div className="card-solid w-full p-6 shadow-xl sm:p-8">
+        <span className="grad-primary flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-md shadow-brand/30">
           <IconBriefcase className="h-6 w-6" />
         </span>
-        <h1 className="mt-4 text-2xl font-black text-slate-900">Masuk ke LamarLoker</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="mt-4 text-2xl font-extrabold text-ink">Masuk ke LamarLoker</h1>
+        <p className="mt-1 text-sm text-muted">
           Belum punya akun?{" "}
-          <Link href="/register" className="font-bold text-brand-text hover:underline">
+          <Link href="/register" className="font-semibold text-brand-text hover:underline">
             Daftar di sini
           </Link>
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-bold text-slate-700">
+            <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">
               Email
             </label>
             <div className="relative">
@@ -67,12 +67,12 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
-                className="input-brutal !pl-10"
+                className="input !pl-10"
               />
             </div>
           </div>
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-bold text-slate-700">
+            <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">
               Password
             </label>
             <input
@@ -82,17 +82,17 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password Anda"
-              className="input-brutal"
+              className="input"
             />
           </div>
 
           {error && (
-            <p className="rounded-xl border-2 border-slate-900 bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text shadow-[3px_3px_0_#0f172a]">
+            <p className="rounded-xl bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text">
               {error}
             </p>
           )}
 
-          <button type="submit" disabled={loading} className="btn-brutal w-full !py-3">
+          <button type="submit" disabled={loading} className="btn-action w-full !py-3">
             {loading ? "Memproses..." : "Masuk"}
           </button>
         </form>

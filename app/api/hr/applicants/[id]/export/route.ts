@@ -52,14 +52,15 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     );
     if (!user) return jsonError("Pelamar tidak ditemukan", 404);
 
-    const scores = await TestScore.find({ applicant: user._id }).lean();
+    const job = user.appliedJobId as unknown as { _id?: unknown; title?: string } | null;
+    const appliedJob = job && typeof job === "object" && job.title ? job.title : "-";
+
+    // Skor hanya untuk lamaran yang sedang berjalan (appliedJobId saat ini).
+    const scores = await TestScore.find({ applicant: user._id, job: job?._id ?? null }).lean();
     const scoreOf = (type: string): string => {
       const s = scores.find((x) => x.type === type);
       return s ? String(s.score) : "-";
     };
-
-    const job = user.appliedJobId as unknown as { title?: string } | null;
-    const appliedJob = job && typeof job === "object" && job.title ? job.title : "-";
 
     const dash = (v: string | undefined | null): string => (v && v.trim() ? v : "-");
 

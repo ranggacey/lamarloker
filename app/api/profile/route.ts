@@ -85,10 +85,16 @@ export async function GET(req: NextRequest) {
     if (!auth) return jsonError("Belum login", 401);
 
     await connectDB();
-    const user = await User.findById(auth.id).populate("appliedJobId", "title division");
+    const user = await User.findById(auth.id);
     if (!user) return jsonError("Pengguna tidak ditemukan", 401);
 
-    const scores = await TestScore.find({ applicant: user._id }).sort({ updatedAt: -1 }).lean();
+    // Skor hanya untuk lamaran yang sedang berjalan (appliedJobId saat
+    // ini). Skor lamaran lama (posisi lain / record lama tanpa job) tidak
+    // ditampilkan, jadi lamaran baru mulai bersih.
+    const scores = await TestScore.find({ applicant: user._id, job: user.appliedJobId ?? null })
+      .sort({ updatedAt: -1 })
+      .lean();
+    await user.populate("appliedJobId", "title division");
     return jsonOk({
       profile: publicProfile(user),
       scores: scores.map((s) => ({

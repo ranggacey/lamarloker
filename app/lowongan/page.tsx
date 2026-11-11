@@ -108,55 +108,56 @@ export default function LowonganPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <LoadingOverlay show={applying !== null} message="Mengirim lamaran..." />
-      <h1 className="flex items-center gap-2 text-2xl font-black text-slate-900">
+      <p className="eyebrow">Lowongan</p>
+      <h1 className="mt-1 flex items-center gap-2 text-2xl font-extrabold text-ink sm:text-3xl">
         <IconBriefcase className="h-7 w-7 text-brand-text" />
         Lamar Pekerjaan
       </h1>
-      <p className="mt-1 text-sm text-slate-600">
+      <p className="mt-1 text-sm text-muted">
         Pilih posisi yang mau kamu lamar. Satu akun melamar satu posisi — kamu bisa ganti posisi kapan saja.
       </p>
 
       {appliedJobId && (
-        <p className="mt-4 flex items-start gap-2 rounded-xl border-2 border-slate-900 bg-success-bg px-4 py-3 text-sm font-medium text-success-text shadow-[3px_3px_0_#0f172a]">
+        <p className="mt-4 flex items-start gap-2 rounded-xl bg-success-bg px-4 py-3 text-sm font-medium text-success-text">
           <IconCheckCircle className="mt-0.5 h-5 w-5 shrink-0" />
           Kamu sedang melamar posisi “{appliedJobTitle}”. Pilih posisi lain di bawah kalau mau ganti lamaran.
         </p>
       )}
       {!loggedIn && (
-        <p className="mt-4 rounded-xl border-2 border-slate-900 bg-white px-4 py-3 text-sm text-slate-700 shadow-[3px_3px_0_#0f172a]">
+        <p className="card mt-4 px-4 py-3 text-sm text-slate-700">
           Kamu belum masuk.{" "}
-          <Link href="/login" className="font-bold text-brand-text hover:underline">
+          <Link href="/login" className="font-semibold text-brand-text hover:underline">
             Masuk dulu
           </Link>{" "}
           atau{" "}
-          <Link href="/register" className="font-bold text-brand-text hover:underline">
+          <Link href="/register" className="font-semibold text-brand-text hover:underline">
             daftar akun
           </Link>{" "}
           untuk bisa melamar.
         </p>
       )}
       {applyMsg && (
-        <p className="mt-4 rounded-xl border-2 border-slate-900 bg-success-bg px-4 py-3 text-sm font-medium text-success-text shadow-[3px_3px_0_#0f172a]">
+        <p className="mt-4 rounded-xl bg-success-bg px-4 py-3 text-sm font-medium text-success-text">
           {applyMsg}
         </p>
       )}
       {applyError && (
-        <p className="mt-4 rounded-xl border-2 border-slate-900 bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text shadow-[3px_3px_0_#0f172a]">
+        <p className="mt-4 rounded-xl bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text">
           {applyError}
         </p>
       )}
       {error && (
-        <p className="mt-4 rounded-xl border-2 border-slate-900 bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text shadow-[3px_3px_0_#0f172a]">
+        <p className="mt-4 rounded-xl bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text">
           {error}
         </p>
       )}
 
       {loading ? (
-        <p className="mt-6 text-sm text-slate-500">Memuat lowongan...</p>
+        <p className="mt-6 text-sm text-muted">Memuat lowongan...</p>
       ) : jobs.length === 0 ? (
-        <div className="card-brutal mt-6 p-10 text-center">
-          <p className="text-sm font-bold text-slate-900">Belum ada lowongan yang dibuka.</p>
-          <p className="mt-1 text-sm text-slate-500">HR akan membuka lowongan baru — cek lagi nanti.</p>
+        <div className="card mt-6 p-10 text-center">
+          <p className="text-sm font-bold text-ink">Belum ada lowongan yang dibuka.</p>
+          <p className="mt-1 text-sm text-muted">HR akan membuka lowongan baru — cek lagi nanti.</p>
         </div>
       ) : (
         <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -164,31 +165,31 @@ export default function LowonganPage() {
             const isApplied = appliedJobId === job.id;
             const open = expanded === job.id;
             return (
-              <article key={job.id} className="card-brutal flex flex-col p-5">
+              <article key={job.id} className="card flex flex-col p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="chip-brutal">{job.type}</span>
-                  {isApplied && <span className="chip-brutal chip-brutal-green">Sudah Dilamar</span>}
+                  <span className="chip">{job.type}</span>
+                  {isApplied && <span className="chip chip-green">Sudah Dilamar</span>}
                 </div>
-                <h2 className="mt-3 text-lg font-black leading-snug text-slate-900">{job.title}</h2>
+                <h2 className="mt-3 text-lg font-bold leading-snug text-ink">{job.title}</h2>
                 {job.division && (
-                  <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-600">
+                  <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
                     <IconBuilding className="h-4 w-4" /> {job.division}
                   </p>
                 )}
                 {job.location && (
-                  <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-600">
+                  <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted">
                     <IconMapPin className="h-4 w-4" /> {job.location}
                   </p>
                 )}
                 {job.description && (
-                  <p className={`mt-3 text-sm leading-relaxed text-slate-600 ${open ? "" : "line-clamp-3"}`}>
+                  <p className={`mt-3 text-sm leading-relaxed text-muted ${open ? "" : "line-clamp-3"}`}>
                     {job.description}
                   </p>
                 )}
                 {open && job.requirements && (
-                  <div className="mt-3">
-                    <p className="text-xs font-black uppercase tracking-wide text-slate-500">Syarat</p>
-                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-slate-600">{job.requirements}</p>
+                  <div className="mt-3 rounded-xl bg-white p-3 ring-1 ring-line">
+                    <p className="eyebrow">Kualifikasi &amp; Persyaratan</p>
+                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted">{job.requirements}</p>
                   </div>
                 )}
                 <p className="mt-2 text-xs text-slate-400">
@@ -198,19 +199,19 @@ export default function LowonganPage() {
                   <button
                     onClick={() => apply(job)}
                     disabled={applying === job.id || isApplied}
-                    className="btn-brutal flex-1 !py-2.5"
+                    className="btn-action flex-1 !py-2.5"
                   >
                     {applying === job.id ? "Mengirim..." : isApplied ? "Sudah Dilamar" : "Lamar"}
                     {!isApplied && <IconArrowRight className="h-4 w-4" />}
                   </button>
                   {(job.description || job.requirements) && (
-                    <button onClick={() => setExpanded(open ? null : job.id)} className="btn-brutal-white !px-3 !py-2.5 !text-xs">
+                    <button onClick={() => setExpanded(open ? null : job.id)} className="btn-secondary !px-3 !py-2.5 !text-xs">
                       {open ? "Tutup" : "Detail"}
                     </button>
                   )}
                 </div>
                 {isApplied && (
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-muted">
                     Mau ganti posisi? Lamar posisi lain — lamaranmu akan pindah ke posisi itu.
                   </p>
                 )}

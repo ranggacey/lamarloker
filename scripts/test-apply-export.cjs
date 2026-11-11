@@ -29,7 +29,14 @@ async function main() {
   console.log("register status:", reg.status);
   const regBody = await reg.json();
   const pelamarId = regBody.data.user.id;
-  const pelamarCookie = (reg.headers.get("set-cookie") || "").split(";")[0];
+  // Register tidak auto-login (by design) -> login dulu untuk dapat cookie.
+  const pelamarLogin = await fetch(BASE + "/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: TEST_EMAIL, password: "password123" }),
+  });
+  console.log("login pelamar status:", pelamarLogin.status);
+  const pelamarCookie = (pelamarLogin.headers.get("set-cookie") || "").split(";")[0];
 
   // Isi CV dummy langsung ke DB (simulasi upload) supaya export punya link CV.
   await users.updateOne(

@@ -1,192 +1,307 @@
 @import "tailwindcss";
 
-/* Palet ColorHunt (identitas LamarLoker):
-   - brand #FA699E (pink utama: tombol, link, highlight)
-   - brand-light #FF9FC7 (pink muda: aksen / hover)
-   - brand-bg #FFE7F0 (pink sangat muda: background)
-   - success #4ADD82 (hijau: lulus)
-   - danger #EF4444 (merah: tidak lolos)
-   Teks memakai slate-900 (gelap netral) supaya kebaca di background terang. */
+/* Palet PT SAMI (https://system.sami.co.id/) — modern korporat elegan:
+   - header gradasi lavender -> ungu terang: #DFBEFF -> #D6AAFF -> #C383FF
+   - tombol utama ungu-merah muda: #D884DB (gradasi #DA89DD -> #D884DB -> #D680DA)
+   - tombol aksi gradasi pink-ungu -> peach: #E299CD -> #EAA7BB -> #F3B8A7
+   - aksen emas: #F3BE22 (dipakai hemat)
+   - background putih #FFFFFF, kartu putih keunguan #FBFBFD, input #F4F7FB
+   - footer gradasi ungu: #D8B7FF -> #BC7EFF
+   - teks judul hampir hitam, isi abu-abu gelap
+   Font Inter (netral, standar aplikasi web korporat; 700-800 untuk judul,
+   600 semibold untuk tombol/label, 400-500 body dengan line-height lega). */
 @theme inline {
-  --color-brand: #fa699e;
-  --color-brand-dark: #e14e8a;
-  --color-brand-light: #ff9fc7;
-  --color-brand-bg: #ffe7f0;
-  --color-brand-text: #db2777;
-  --color-success: #4add82;
-  --color-success-bg: #e9fdf1;
+  --color-brand: #d884db;
+  --color-brand-dark: #b45cc0;
+  --color-brand-deep: #8b5cf6;
+  --color-brand-light: #f3e8ff;
+  --color-brand-soft: #fbfbfd;
+  --color-brand-text: #9d4edd;
+  --color-gold: #f3be22;
+  --color-ink: #17142b;
+  --color-muted: #5b6472;
+  --color-input-bg: #f4f7fb;
+  --color-line: #ede7f6;
+  --color-success: #16a34a;
+  --color-success-bg: #e7f8ee;
   --color-success-text: #15803d;
-  --color-danger: #ef4444;
-  --color-danger-bg: #fef2f2;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fdecec;
   --color-danger-text: #b91c1c;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-warning: #d97706;
+  --color-warning-bg: #fef6e0;
+  --color-warning-text: #92400e;
+  --color-info: #6d28d9;
+  --color-info-bg: #f1eafe;
+  --color-info-text: #5b21b6;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 body {
-  background: #ffe7f0;
-  color: #0f172a;
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  background: #ffffff;
+  color: #1f2430;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.6;
 }
 
-/* ---------- Soft neobrutalism ---------- */
-/* Border tebal slate-900 + shadow offset keras + sudut rounded (soft).
-   Ditulis sebagai CSS biasa (bukan @apply) supaya tidak ada risiko build. */
+/* ---------- Hierarki tipografi Inter (korporat) ----------
+   Judul tegas: tebal 700-800, line-height rapat, letter-spacing sedikit
+   negatif. Subjudul/label seksi memakai .eyebrow (kapital, tracking lebar).
+   Body 400-500 dengan line-height lega 1.6. Angka penting (skor, statistik)
+   memakai font-extrabold di markup masing-masing. */
+h1 {
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+h2 {
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
 
-.card-brutal {
-  background: #fff;
-  border: 2px solid #0f172a;
+/* ---------- Gradasi PT SAMI ---------- */
+.grad-header {
+  background: linear-gradient(90deg, #dfbeff 0%, #d6aaff 50%, #c383ff 100%);
+}
+.grad-primary {
+  background: linear-gradient(90deg, #da89dd 0%, #d884db 55%, #d680da 100%);
+}
+.grad-action {
+  background: linear-gradient(90deg, #e299cd 0%, #eaa7bb 50%, #f3b8a7 100%);
+}
+.grad-footer {
+  background: linear-gradient(90deg, #d8b7ff 0%, #bc7eff 100%);
+}
+.grad-text {
+  background: linear-gradient(90deg, #c383ff, #d884db 55%, #e299cd);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Kartu korporat ---------- */
+.card {
+  background: #fbfbfd;
+  border: 1px solid #ede7f6;
   border-radius: 1rem;
-  box-shadow: 4px 4px 0 #0f172a;
+  box-shadow: 0 4px 24px rgba(109, 72, 181, 0.07);
 }
-
-.card-brutal-flat {
-  background: #fff;
-  border: 2px solid #0f172a;
+.card-solid {
+  background: #ffffff;
+  border: 1px solid #ede7f6;
   border-radius: 1rem;
-  box-shadow: 2px 2px 0 #0f172a;
+  box-shadow: 0 4px 24px rgba(109, 72, 181, 0.07);
 }
 
-.btn-brutal {
+/* ---------- Tombol korporat (transisi halus) ---------- */
+.btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 2px solid #0f172a;
+  border: none;
   border-radius: 0.75rem;
-  background: #fa699e;
+  background: linear-gradient(90deg, #da89dd 0%, #d884db 55%, #d680da 100%);
   color: #fff;
-  padding: 0.625rem 1rem;
+  padding: 0.625rem 1.25rem;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25rem;
-  box-shadow: 3px 3px 0 #0f172a;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  box-shadow: 0 6px 16px rgba(216, 132, 219, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   cursor: pointer;
   text-decoration: none;
 }
-.btn-brutal:hover {
-  background: #e14e8a;
-  transform: translate(1px, 1px);
-  box-shadow: 2px 2px 0 #0f172a;
+.btn-primary:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(216, 132, 219, 0.4);
 }
-.btn-brutal:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 #0f172a;
+.btn-primary:active {
+  transform: translateY(0);
 }
-.btn-brutal:disabled {
+.btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 3px 3px 0 #0f172a;
 }
 
-.btn-brutal-white {
+.btn-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 2px solid #0f172a;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #e299cd 0%, #eaa7bb 50%, #f3b8a7 100%);
+  color: #fff;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  box-shadow: 0 6px 16px rgba(226, 153, 205, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-action:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(226, 153, 205, 0.45);
+}
+.btn-action:active {
+  transform: translateY(0);
+}
+.btn-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid #e5e0f2;
   border-radius: 0.75rem;
   background: #fff;
-  color: #0f172a;
-  padding: 0.625rem 1rem;
+  color: #3f3a56;
+  padding: 0.625rem 1.25rem;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25rem;
-  box-shadow: 3px 3px 0 #0f172a;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  box-shadow: 0 2px 8px rgba(109, 72, 181, 0.06);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
   cursor: pointer;
   text-decoration: none;
 }
-.btn-brutal-white:hover {
-  background: #ffe7f0;
-  transform: translate(1px, 1px);
-  box-shadow: 2px 2px 0 #0f172a;
+.btn-secondary:hover {
+  border-color: #d884db;
+  background: #fbf7ff;
+  transform: translateY(-1px);
 }
-.btn-brutal-white:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 #0f172a;
-}
-.btn-brutal-white:disabled {
+.btn-secondary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 3px 3px 0 #0f172a;
 }
 
-.btn-brutal-dark {
+.btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border: 2px solid #0f172a;
+  gap: 0.375rem;
+  border: none;
   border-radius: 0.75rem;
-  background: #0f172a;
-  color: #fff;
-  padding: 0.625rem 1rem;
+  background: transparent;
+  color: #9d4edd;
+  padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25rem;
-  box-shadow: 3px 3px 0 #fa699e;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  transition: background 0.2s ease;
   cursor: pointer;
   text-decoration: none;
 }
-.btn-brutal-dark:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 2px 2px 0 #fa699e;
+.btn-ghost:hover {
+  background: #f6f0ff;
 }
-.btn-brutal-dark:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 #fa699e;
-}
-.btn-brutal-dark:disabled {
+.btn-ghost:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: 3px 3px 0 #fa699e;
 }
 
-.input-brutal {
+.btn-danger-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border: 1px solid #fbd5d5;
+  border-radius: 0.75rem;
+  background: #fdecec;
+  color: #b91c1c;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  transition: background 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-danger-soft:hover {
+  background: #fbdada;
+}
+.btn-danger-soft:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- Input korporat ---------- */
+.input {
   width: 100%;
-  border: 2px solid #0f172a;
+  border: 1px solid #e6e9f2;
   border-radius: 0.75rem;
-  background: #fff;
-  padding: 0.625rem 0.75rem;
+  background: #f4f7fb;
+  padding: 0.625rem 0.875rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: #0f172a;
+  color: #1f2430;
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
-.input-brutal::placeholder {
+.input::placeholder {
   color: #94a3b8;
 }
-.input-brutal:focus {
-  box-shadow: 3px 3px 0 #fa699e;
+.input:focus {
+  border-color: #d884db;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(216, 132, 219, 0.18);
+}
+.input:disabled {
+  opacity: 0.6;
 }
 
-.chip-brutal {
+/* ---------- Chip / pill lembut ---------- */
+.chip {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  border: 2px solid #0f172a;
   border-radius: 9999px;
-  background: #ffe7f0;
+  background: #f1eafe;
   padding: 0.125rem 0.625rem;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25rem;
-  color: #0f172a;
+  color: #6d28d9;
   white-space: nowrap;
 }
-
-.chip-brutal-green {
-  background: #4add82;
-  color: #0f172a;
+.chip-green {
+  background: #e7f8ee;
+  color: #15803d;
+}
+.chip-amber {
+  background: #fef6e0;
+  color: #92400e;
+}
+.chip-red {
+  background: #fdecec;
+  color: #b91c1c;
+}
+.chip-gray {
+  background: #f1f5f9;
+  color: #475569;
+}
+.chip-white {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
 }
 
-.chip-brutal-white {
-  background: #fff;
-  color: #0f172a;
+/* ---------- Label seksi (kecil, kapital, tracking lebar) ---------- */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b07cd8;
 }

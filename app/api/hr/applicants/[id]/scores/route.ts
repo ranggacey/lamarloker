@@ -2,11 +2,13 @@ import type { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 import { jsonOk, jsonError, handleError } from "@/lib/http";
-import { scoreStatus, applicantStatusFromScores } from "@/lib/score";
+import { scoreStatus } from "@/lib/score";
 import { User } from "@/models/User";
 import { TestScore, type TestType } from "@/models/TestScore";
 
-/** Input / update skor tes pelamar (HR saja). Skor >= 70 = lulus. */
+/** Input / update skor tes pelamar (HR saja). Skor >= 70 = lulus.
+    Skor INTERVIEW otomatis mengubah status pelamar (penentu lolos/tidak
+    lolos untuk posisi yang dilamar); skor psikotes tidak mengubah status. */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
     const auth = getAuthUser(req);
@@ -30,18 +32,26 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     const applicant = await User.findOne({ _id: id, role: "pelamar" });
     if (!applicant) return jsonError("Pelamar tidak ditemukan", 404);
 
+    // Skor terikat ke LAMARAN yang sedang berjalan (appliedJobId saat ini),
+    // bukan ke pelamar secara umum — jadi skor lamaran lama tidak terbawa
+    // saat pelamar melamar posisi baru.
+    const jobId = applicant.appliedJobId ?? null;
     const status = scoreStatus(score);
     const saved = await TestScore.findOneAndUpdate(
-      { applicant: applicant._id, type },
-      { score, status, note, createdBy: auth.id },
+      { applicant: applicant._id, job: jobId, type },
+      { score, status, note, createdBy: auth.id, job: jobId },
       { upsert: true, new: true }
     );
 
-    // Hitung ulang status pelamar dari semua skornya.
-    const all = await TestScore.find({ applicant: applicant._id }).lean();
-    const newStatus = applicantStatusFromScores(all.map((s) => ({ type: s.type, status: s.status })));
-    applicant.status = newStatus;
-    await applicant.save();
+    // Status pelamar ditentukan oleh skor INTERVIEW saja (penentu utama
+    // lolos/tidak lolos). Skor psikotes tidak mengubah status.
+    // HR tetap bisa mengubah status manual lewat endpoint PATCH pelamar.
+    let applicantStatus = applicant.status;
+    if (type === "interview") {
+      applicantStatus = status;
+      applicant.status = applicantStatus;
+      await applicant.save();
+    }
 
     return jsonOk({
       score: {
@@ -52,7 +62,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
         note: saved.note ?? "",
         updatedAt: saved.updatedAt,
       },
-      applicantStatus: newStatus,
+      applicantStatus,
     });
   } catch (err) {
     return handleError(err);

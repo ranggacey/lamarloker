@@ -24,9 +24,21 @@ async function getRows(): Promise<Row[]> {
   const ids = users.map((u) => u._id);
   const scores = await TestScore.find({ applicant: { $in: ids } }).lean();
 
+  // Skor hanya untuk lamaran yang sedang berjalan: cocokkan skor dengan
+  // appliedJobId pelamar saat ini (skor lamaran lama tidak ikut diekspor).
+  const currentJobByUser = new Map<string, string | null>();
+  for (const u of users) {
+    const jobDoc = u.appliedJobId as unknown as { _id?: unknown } | null;
+    currentJobByUser.set(
+      String(u._id),
+      jobDoc && typeof jobDoc === "object" && jobDoc._id ? String(jobDoc._id) : null
+    );
+  }
   const scoreMap = new Map<string, Map<string, number>>();
   for (const s of scores) {
     const key = String(s.applicant);
+    const jobKey = s.job ? String(s.job) : null;
+    if (jobKey !== currentJobByUser.get(key)) continue;
     if (!scoreMap.has(key)) scoreMap.set(key, new Map());
     scoreMap.get(key)!.set(s.type, s.score);
   }

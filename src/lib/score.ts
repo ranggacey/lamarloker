@@ -9,16 +9,19 @@ export function scoreStatus(score: number): TestStatus {
 export type ApplicantStatus = "baru" | "proses" | "lulus" | "tidak lolos";
 
 /**
- * Status pelamar dari skor-skor tesnya:
- * - belum ada skor            -> "baru"
- * - ada skor yang tidak lolos  -> "tidak lolos"
- * - interview + psikotes lulus -> "lulus"
- * - selain itu                 -> "proses"
+ * Status pelamar ditentukan oleh skor INTERVIEW — penentu utama
+ * lolos/tidak lolos untuk posisi yang dilamar:
+ * - skor interview >= 70 -> "lulus"
+ * - skor interview <= 69 -> "tidak lolos"
+ *
+ * Skor psikotes TIDAK mengubah status pelamar.
+ * Status "baru" (baru daftar/lamar) adalah nilai awal, dan "proses"
+ * (sedang dalam proses seleksi) diisi manual oleh HR — keduanya bisa
+ * diubah manual oleh HR lewat endpoint PATCH pelamar. Kalau skor
+ * interview diubah, status ikut diperbarui sesuai skor terbaru.
+ *
+ * Skor terikat ke LAMARAN (per posisi yang dilamar), bukan ke pelamar:
+ * TestScore punya field `job` (posisi yang dinilai). Melamar posisi baru
+ * mereset status ke "baru" dan menghapus skor untuk posisi itu, jadi skor
+ * lamaran lama tidak terbawa ke lamaran baru.
  */
-export function applicantStatusFromScores(scores: { type: string; status: TestStatus }[]): ApplicantStatus {
-  if (scores.length === 0) return "baru";
-  if (scores.some((s) => s.status === "tidak lolos")) return "tidak lolos";
-  const types = new Set(scores.map((s) => s.type));
-  if (types.has("interview") && types.has("psikotes")) return "lulus";
-  return "proses";
-}

@@ -16,6 +16,7 @@ import {
   IconUser,
 } from "@/components/icons";
 import { StatusBadge, ScoreBadge } from "@/components/StatusBadge";
+import ApplicationTracker from "@/components/ApplicationTracker";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
 interface Experience {
@@ -76,6 +77,13 @@ function safeFilename(name: string): string {
   return slug || "pelamar";
 }
 
+const STATUS_OPTIONS: { value: Applicant["status"]; label: string }[] = [
+  { value: "baru", label: "Baru Daftar" },
+  { value: "proses", label: "Proses" },
+  { value: "lulus", label: "Lolos" },
+  { value: "tidak lolos", label: "Tidak Lolos" },
+];
+
 function HrDetailContent() {
   const params = useParams();
   const id = String(params.id ?? "");
@@ -91,6 +99,11 @@ function HrDetailContent() {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState("");
+
+  // Ubah status manual (PATCH /api/hr/applicants/[id]).
+  const [statusValue, setStatusValue] = useState<Applicant["status"]>("baru");
+  const [statusSaving, setStatusSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState("");
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -108,6 +121,7 @@ function HrDetailContent() {
         return;
       }
       setApplicant(j.data.applicant);
+      setStatusValue(j.data.applicant.status);
       setScores(j.data.scores);
     } catch {
       setError("Tidak bisa terhubung ke server");
@@ -175,10 +189,43 @@ function HrDetailContent() {
     }
   }
 
+  async function saveStatus(e: FormEvent) {
+    e.preventDefault();
+    setStatusSaving(true);
+    setStatusMsg("");
+    setError("");
+    try {
+      const res = await fetch(`/api/hr/applicants/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: statusValue }),
+      });
+      const j = (await res.json()) as {
+        ok: boolean;
+        error?: string;
+        data?: { applicantStatus: string };
+      };
+      if (!j.ok) {
+        setError(j.error ?? "Gagal mengubah status");
+        return;
+      }
+      const next = j.data?.applicantStatus as Applicant["status"] | undefined;
+      if (next) {
+        setApplicant((prev) => (prev ? { ...prev, status: next } : prev));
+        setStatusValue(next);
+      }
+      setStatusMsg(`Status pelamar diubah menjadi: ${next ?? statusValue}.`);
+    } catch {
+      setError("Tidak bisa terhubung ke server");
+    } finally {
+      setStatusSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <p className="text-slate-500">Memuat detail pelamar...</p>
+        <p className="text-muted">Memuat detail pelamar...</p>
       </div>
     );
   }
@@ -186,33 +233,33 @@ function HrDetailContent() {
   if (!applicant) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <p className="rounded-xl border-2 border-slate-900 bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text shadow-[3px_3px_0_#0f172a]">
+        <p className="rounded-xl bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text">
           {error || "Pelamar tidak ditemukan."}
         </p>
-        <Link href="/hr" className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-text hover:underline">
+        <Link href="/hr" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-text hover:underline">
           Kembali ke daftar pelamar
         </Link>
       </div>
     );
   }
 
-  const inputCls = "input-brutal";
+  const inputCls = "input";
 
   const docRow = (title: string, url: string, icon: React.ReactNode) => (
-    <div className="flex flex-col gap-3 rounded-xl border-2 border-slate-900 bg-white p-4 shadow-[2px_2px_0_#0f172a] sm:flex-row sm:items-center">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-slate-900 bg-brand-bg text-brand-text">
+    <div className="flex flex-col gap-3 rounded-xl bg-white p-4 ring-1 ring-line sm:flex-row sm:items-center">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-info-bg text-brand-text">
         {icon}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-black text-slate-900">{title}</p>
-        <p className="text-xs text-slate-500">{url ? "Tersimpan di Cloudinary" : "Belum diunggah pelamar"}</p>
+        <p className="text-sm font-bold text-ink">{title}</p>
+        <p className="text-xs text-muted">{url ? "Tersimpan di Cloudinary" : "Belum diunggah pelamar"}</p>
       </div>
       {url ? (
         <div className="flex shrink-0 gap-2">
-          <a href={url} target="_blank" rel="noopener noreferrer" className="btn-brutal-white !px-3 !py-2 !text-xs">
+          <a href={url} target="_blank" rel="noopener noreferrer" className="btn-secondary !px-3 !py-2 !text-xs">
             <IconEye className="h-4 w-4" /> Lihat
           </a>
-          <a href={url} download target="_blank" rel="noopener noreferrer" className="btn-brutal !px-3 !py-2 !text-xs">
+          <a href={url} download target="_blank" rel="noopener noreferrer" className="btn-primary !px-3 !py-2 !text-xs">
             <IconDownload className="h-4 w-4" /> Download
           </a>
         </div>
@@ -224,8 +271,8 @@ function HrDetailContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <LoadingOverlay show={saving} message="Menyimpan..." />
-      <Link href="/hr" className="inline-flex items-center gap-1 text-sm font-bold text-brand-text hover:underline">
+      <LoadingOverlay show={saving || statusSaving} message="Menyimpan..." />
+      <Link href="/hr" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-text hover:underline">
         <IconChevronRight className="h-4 w-4 rotate-180" />
         Kembali ke daftar pelamar
       </Link>
@@ -234,19 +281,19 @@ function HrDetailContent() {
         <div className="flex items-start gap-4">
           {applicant.photoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={applicant.photoUrl} alt={applicant.name} className="h-20 w-20 rounded-2xl border-2 border-slate-900 object-cover shadow-[3px_3px_0_#0f172a]" />
+            <img src={applicant.photoUrl} alt={applicant.name} className="h-20 w-20 rounded-2xl object-cover ring-2 ring-line" />
           ) : (
-            <span className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-slate-900 bg-brand-bg text-slate-400 shadow-[3px_3px_0_#0f172a]">
+            <span className="flex h-20 w-20 items-center justify-center rounded-2xl bg-info-bg text-slate-400">
               <IconUser className="h-10 w-10" />
             </span>
           )}
           <div>
-            <h1 className="text-2xl font-black text-slate-900">{applicant.name}</h1>
-            <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-600">
+            <h1 className="text-2xl font-extrabold text-ink">{applicant.name}</h1>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
               <IconMail className="h-4 w-4" /> {applicant.email}
             </p>
             {applicant.phone && (
-              <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-600">
+              <p className="mt-0.5 flex items-center gap-1.5 text-sm text-muted">
                 <IconPhone className="h-4 w-4" /> {applicant.phone}
               </p>
             )}
@@ -257,74 +304,62 @@ function HrDetailContent() {
         </div>
         <div className="flex flex-col items-end gap-2">
           <StatusBadge status={applicant.status} />
-          <button onClick={exportOne} disabled={exporting} className="btn-brutal !py-2 !text-xs">
+          <button onClick={exportOne} disabled={exporting} className="btn-primary !py-2 !text-xs">
             <IconDownload className="h-4 w-4" />
             {exporting ? "Menyiapkan..." : "Export Excel Pelamar"}
           </button>
         </div>
       </div>
 
-      {/* Posisi yang dilamar */}
-      <div className="card-brutal mt-6 p-5 sm:p-6">
-        <h2 className="flex items-center gap-2 text-base font-black text-slate-900">
-          <IconBriefcase className="h-5 w-5 text-brand-text" />
-          Posisi yang dilamar
-        </h2>
-        {applicant.appliedJob ? (
-          <div className="mt-3">
-            <span className="chip-brutal !text-sm">{applicant.appliedJob.title}</span>
-            {applicant.appliedJob.division && (
-              <span className="ml-2 text-sm text-slate-600">{applicant.appliedJob.division}</span>
-            )}
-            {applicant.appliedAt && (
-              <p className="mt-2 text-xs text-slate-500">
-                Dilamar {new Date(applicant.appliedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-              </p>
-            )}
-          </div>
-        ) : (
-          <p className="mt-2 text-sm text-slate-500">Pelamar belum memilih posisi.</p>
-        )}
+      {/* Pelacak lamaran: posisi + status + alur + skor + hasil */}
+      <div className="mt-6">
+        <ApplicationTracker
+          appliedJob={applicant.appliedJob}
+          appliedAt={applicant.appliedAt}
+          status={applicant.status}
+          scores={scores}
+          context="hr"
+        />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-5">
         {/* Profil + dokumen + pengalaman */}
         <div className="space-y-6 lg:col-span-3">
-          <div className="card-brutal p-5 sm:p-6">
-            <h2 className="text-base font-black text-slate-900">Profil pelamar</h2>
+          <div className="card p-5 sm:p-6">
+            <h2 className="text-base font-bold text-ink">Profil pelamar</h2>
             <dl className="mt-4 space-y-3 text-sm">
               <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-                <dt className="w-36 shrink-0 font-bold text-slate-500">Pendidikan</dt>
-                <dd className="text-slate-900">{applicant.education || "-"}</dd>
+                <dt className="w-36 shrink-0 font-semibold text-muted">Pendidikan</dt>
+                <dd className="text-ink">{applicant.education || "-"}</dd>
               </div>
               <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-                <dt className="w-36 shrink-0 font-bold text-slate-500">Alamat</dt>
-                <dd className="text-slate-900">{applicant.address || "-"}</dd>
+                <dt className="w-36 shrink-0 font-semibold text-muted">Alamat</dt>
+                <dd className="text-ink">{applicant.address || "-"}</dd>
               </div>
               <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-                <dt className="w-36 shrink-0 font-bold text-slate-500">Ringkasan pengalaman</dt>
-                <dd className="whitespace-pre-line text-slate-900">{applicant.experience || "-"}</dd>
+                <dt className="w-36 shrink-0 font-semibold text-muted">Ringkasan pengalaman</dt>
+                <dd className="whitespace-pre-line text-ink">{applicant.experience || "-"}</dd>
               </div>
             </dl>
           </div>
 
           {/* Riwayat pengalaman */}
-          <div className="card-brutal p-5 sm:p-6">
-            <h2 className="text-base font-black text-slate-900">Riwayat pengalaman</h2>
+          <div className="card p-5 sm:p-6">
+            <h2 className="text-base font-bold text-ink">Riwayat pengalaman</h2>
             {applicant.experiences.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-500">Pelamar belum mengisi riwayat pengalaman.</p>
+              <p className="mt-2 text-sm text-muted">Pelamar belum mengisi riwayat pengalaman.</p>
             ) : (
               <ul className="mt-4 space-y-3">
                 {applicant.experiences.map((exp) => (
-                  <li key={exp.id} className="rounded-xl border-2 border-slate-900 bg-brand-bg px-4 py-3 shadow-[2px_2px_0_#0f172a]">
-                    <p className="text-sm font-black text-slate-900">
-                      {exp.position || "-"} <span className="font-medium text-slate-500">di</span> {exp.company || "-"}
+                  <li key={exp.id} className="rounded-xl bg-white px-4 py-3 ring-1 ring-line">
+                    <p className="text-sm font-bold text-ink">
+                      {exp.position || "-"} <span className="font-medium text-muted">di</span> {exp.company || "-"}
                     </p>
-                    <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
+                    <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
                       <IconCalendar className="h-4 w-4" /> {formatPeriod(exp)}
                     </p>
                     {exp.description && (
-                      <p className="mt-1 whitespace-pre-line text-sm text-slate-600">{exp.description}</p>
+                      <p className="mt-1 whitespace-pre-line text-sm text-muted">{exp.description}</p>
                     )}
                   </li>
                 ))}
@@ -333,8 +368,8 @@ function HrDetailContent() {
           </div>
 
           {/* Dokumen */}
-          <div className="card-brutal p-5 sm:p-6">
-            <h2 className="text-base font-black text-slate-900">Dokumen pelamar</h2>
+          <div className="card p-5 sm:p-6">
+            <h2 className="text-base font-bold text-ink">Dokumen pelamar</h2>
             <div className="mt-4 space-y-3">
               {docRow("CV", applicant.cvUrl, <IconFileText className="h-6 w-6" />)}
               {docRow("Ijazah", applicant.ijazahUrl, <IconGraduation className="h-6 w-6" />)}
@@ -344,17 +379,17 @@ function HrDetailContent() {
           </div>
 
           {/* Riwayat skor */}
-          <div className="card-brutal p-5 sm:p-6">
-            <h2 className="text-base font-black text-slate-900">Riwayat skor tes</h2>
+          <div className="card p-5 sm:p-6">
+            <h2 className="text-base font-bold text-ink">Riwayat skor tes</h2>
             {scores.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-500">Belum ada skor. Input skor pertama lewat form di samping.</p>
+              <p className="mt-2 text-sm text-muted">Belum ada skor. Input skor pertama lewat form di samping.</p>
             ) : (
               <ul className="mt-4 space-y-3">
                 {scores.map((s) => (
-                  <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border-2 border-slate-900 bg-brand-bg px-4 py-3 shadow-[2px_2px_0_#0f172a]">
+                  <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white px-4 py-3 ring-1 ring-line">
                     <div>
-                      <p className="text-sm font-bold capitalize text-slate-900">{s.type}</p>
-                      {s.note && <p className="text-xs text-slate-500">{s.note}</p>}
+                      <p className="text-sm font-bold capitalize text-ink">{s.type}</p>
+                      {s.note && <p className="text-xs text-muted">{s.note}</p>}
                       <p className="text-xs text-slate-400">
                         {new Date(s.updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                       </p>
@@ -367,58 +402,92 @@ function HrDetailContent() {
           </div>
         </div>
 
-        {/* Form input skor */}
-        <form onSubmit={submitScore} className="card-brutal h-fit p-5 sm:p-6 lg:col-span-2">
-          <h2 className="text-base font-black text-slate-900">Input skor tes</h2>
-          <p className="mt-1 text-xs leading-relaxed text-slate-500">
-            Skor 70–100 = lulus, skor 0–69 = tidak lolos. Input ulang akan memperbarui skor tes yang sama.
-          </p>
-          <div className="mt-4 space-y-4">
-            <div>
-              <label htmlFor="type" className="mb-1.5 block text-sm font-bold text-slate-700">Jenis tes</label>
-              <select id="type" value={type} onChange={(e) => setType(e.target.value as "interview" | "psikotes")} className={inputCls}>
-                <option value="interview">Interview</option>
-                <option value="psikotes">Psikotes</option>
+        {/* Kolom kanan: form input skor + ubah status manual */}
+        <div className="space-y-6 lg:col-span-2">
+          <form onSubmit={submitScore} className="card h-fit p-5 sm:p-6">
+            <h2 className="text-base font-bold text-ink">Input skor tes</h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Skor 70–100 = lulus, skor 0–69 = tidak lolos. Input ulang akan memperbarui skor tes yang sama.
+            </p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label htmlFor="type" className="mb-1.5 block text-sm font-semibold text-slate-700">Jenis tes</label>
+                <select id="type" value={type} onChange={(e) => setType(e.target.value as "interview" | "psikotes")} className={inputCls}>
+                  <option value="interview">Interview</option>
+                  <option value="psikotes">Psikotes</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="score" className="mb-1.5 block text-sm font-semibold text-slate-700">Skor (0–100)</label>
+                <input
+                  id="score"
+                  type="number"
+                  min={0}
+                  max={100}
+                  required
+                  value={score}
+                  onChange={(e) => setScore(e.target.value)}
+                  placeholder="cth: 85"
+                  className={inputCls}
+                />
+                {score !== "" && Number(score) >= 0 && Number(score) <= 100 && (
+                  <p className="mt-2">
+                    <ScoreBadge score={Number(score)} />
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="note" className="mb-1.5 block text-sm font-semibold text-slate-700">Catatan (opsional)</label>
+                <textarea id="note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="cth: Komunikasi baik, perlu pendalaman teknis." className={inputCls} />
+              </div>
+            </div>
+            {error && (
+              <p className="mt-4 rounded-xl bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text">
+                {error}
+              </p>
+            )}
+            {savedMsg && (
+              <p className="mt-4 rounded-xl bg-success-bg px-4 py-3 text-sm font-medium text-success-text">
+                {savedMsg}
+              </p>
+            )}
+            <button type="submit" disabled={saving} className="btn-action mt-5 w-full !py-3">
+              {saving ? "Menyimpan..." : "Simpan skor"}
+            </button>
+          </form>
+
+          {/* Ubah status manual */}
+          <form onSubmit={saveStatus} className="card h-fit p-5 sm:p-6">
+            <h2 className="text-base font-bold text-ink">Ubah status pelamar</h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Status manual untuk menandai proses seleksi atau mengoreksi hasil otomatis. Jika skor
+              interview diinput/diubah lagi, status akan mengikuti skor interview secara otomatis.
+            </p>
+            <div className="mt-4">
+              <label htmlFor="statusManual" className="mb-1.5 block text-sm font-semibold text-slate-700">Status</label>
+              <select
+                id="statusManual"
+                value={statusValue}
+                onChange={(e) => setStatusValue(e.target.value as Applicant["status"])}
+                className={inputCls}
+              >
+                {STATUS_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
               </select>
             </div>
-            <div>
-              <label htmlFor="score" className="mb-1.5 block text-sm font-bold text-slate-700">Skor (0–100)</label>
-              <input
-                id="score"
-                type="number"
-                min={0}
-                max={100}
-                required
-                value={score}
-                onChange={(e) => setScore(e.target.value)}
-                placeholder="cth: 85"
-                className={inputCls}
-              />
-              {score !== "" && Number(score) >= 0 && Number(score) <= 100 && (
-                <p className="mt-2">
-                  <ScoreBadge score={Number(score)} />
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="note" className="mb-1.5 block text-sm font-bold text-slate-700">Catatan (opsional)</label>
-              <textarea id="note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="cth: Komunikasi baik, perlu pendalaman teknis." className={inputCls} />
-            </div>
-          </div>
-          {error && (
-            <p className="mt-4 rounded-xl border-2 border-slate-900 bg-danger-bg px-4 py-3 text-sm font-medium text-danger-text shadow-[3px_3px_0_#0f172a]">
-              {error}
-            </p>
-          )}
-          {savedMsg && (
-            <p className="mt-4 rounded-xl border-2 border-slate-900 bg-success-bg px-4 py-3 text-sm font-medium text-success-text shadow-[3px_3px_0_#0f172a]">
-              {savedMsg}
-            </p>
-          )}
-          <button type="submit" disabled={saving} className="btn-brutal mt-5 w-full !py-3">
-            {saving ? "Menyimpan..." : "Simpan skor"}
-          </button>
-        </form>
+            {statusMsg && (
+              <p className="mt-4 rounded-xl bg-success-bg px-4 py-3 text-sm font-medium text-success-text">
+                {statusMsg}
+              </p>
+            )}
+            <button type="submit" disabled={statusSaving} className="btn-primary mt-5 w-full !py-3">
+              {statusSaving ? "Menyimpan..." : "Simpan status"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -429,7 +498,7 @@ export default function HrDetailPage() {
     <Suspense
       fallback={
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-          <p className="text-slate-500">Memuat detail pelamar...</p>
+          <p className="text-muted">Memuat detail pelamar...</p>
         </div>
       }
     >
